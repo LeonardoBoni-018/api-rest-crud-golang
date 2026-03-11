@@ -7,6 +7,7 @@ import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/validation"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/model/request"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -31,7 +32,8 @@ func CreateUser(c *gin.Context) {
 	}
 
 	domain := model.NewUserDomain(userRequest.Email, userRequest.Password, userRequest.Name, userRequest.Age)
-	if err := domain.CreateUserDomain(); err != nil {
+	service := service.NewUserDomainService()
+	if err := service.CreateUserDomain(domain); err != nil {
 		c.JSON(err.Code, err)
 		return
 	}
