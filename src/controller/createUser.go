@@ -7,7 +7,7 @@ import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/validation"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/model/request"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model/service"
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/view"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -16,7 +16,7 @@ var (
 	UserDomainInterface model.UserDomainInterface
 )
 
-func CreateUser(c *gin.Context) {
+func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 	loger.Info("Init CreateUser controller",
 		zap.String("journey", "CreateUser"),
 	)
@@ -32,20 +32,13 @@ func CreateUser(c *gin.Context) {
 	}
 
 	domain := model.NewUserDomain(userRequest.Email, userRequest.Password, userRequest.Name, userRequest.Age)
-	service := service.NewUserDomainService()
-	if err := service.CreateUserDomain(domain); err != nil {
+	if err := uc.service.CreateUserDomain(domain); err != nil {
 		c.JSON(err.Code, err)
 		return
 	}
 
-	// response := response.UserResponse{
-	// 	ID:    "test",
-	// 	Email: userRequest.Email,
-	// 	Name:  userRequest.Name,
-	// 	Age:   userRequest.Age,
-	// }
 	loger.Info("User created successfully",
 		zap.String("journey", "CreateUser"),
 	)
-	c.String(http.StatusOK, "")
+	c.JSON(http.StatusOK, view.ConvertDomainToResponse(domain))
 }
