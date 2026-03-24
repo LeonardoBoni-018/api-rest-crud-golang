@@ -7,11 +7,9 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/loger"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/database/mongodb"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/routes"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model/service"
-
 )
 
 func main() {
@@ -21,8 +19,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	
-	mongodb.InitConncetion()
 
 	// Init dependency injection
 	service := service.NewUserDomainService()
