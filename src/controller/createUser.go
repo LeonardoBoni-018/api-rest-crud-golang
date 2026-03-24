@@ -3,13 +3,15 @@ package controller
 import (
 	"net/http"
 
+	"github.com/bytedance/gopkg/util/logger"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/loger"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/validation"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/model/request"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/view"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 var (
@@ -33,6 +35,8 @@ func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 
 	domain := model.NewUserDomain(userRequest.Email, userRequest.Password, userRequest.Name, userRequest.Age)
 	if err := uc.service.CreateUserDomain(domain); err != nil {
+		logger.Info("Error trying to call CreateUser", zap.String("journey", "createUser"))
+
 		c.JSON(err.Code, err)
 		return
 	}

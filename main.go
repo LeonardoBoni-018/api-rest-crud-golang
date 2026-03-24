@@ -1,15 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/loger"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller"
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/database/mongodb"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/routes"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model/service"
 )
 
 func main() {
@@ -20,9 +20,15 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// Init dependency injection
-	service := service.NewUserDomainService()
-	userController := controller.NewUserControllerInterface(service)
+	database, err := mongodb.NewMongoDBConnection(context.Background())
+	if err != nil {
+		log.Fatalf(
+			"Error trying to conect to database, error=%s /n",
+			err.Error())
+		return
+	}
+
+	userController := initDependencies(database)
 
 	router := gin.Default()
 	// Inicializa as rotas
