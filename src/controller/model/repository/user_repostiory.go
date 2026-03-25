@@ -38,14 +38,14 @@ type UserRepository interface {
 	// 	userId string,
 	// ) *rest_err.RestErr
 
-	// FindUserByEmail(
-	// 	email string,
-	// ) (model.UserDomainInterface, *rest_err.RestErr)
+	FindUserByEmail(
+		email string,
+	) (model.UserDomainInterface, *rest_err.RestErr)
 	// FindUserByEmailAndPassword(
 	// 	email string,
 	// 	password string,
 	// ) (model.UserDomainInterface, *rest_err.RestErr)
-	// FindUserByID(
-	// 	id string,
-	// ) (model.UserDomainInterface, *rest_err.RestErr)
+	FindUserByID(
+		id string,
+	) (model.UserDomainInterface, *rest_err.RestErr)
 }
