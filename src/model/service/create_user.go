@@ -9,7 +9,7 @@ import (
 
 )
 
-func (ud *userDomainService) CreateUserDomain(
+func (ud *userDomainService) CreateUserServices(
 	userDomain model.UserDomainInterface,
 ) *rest_err.RestErr {
 	logger.Info("Init CreateUserDomain", zap.String("journey", "createUser"))

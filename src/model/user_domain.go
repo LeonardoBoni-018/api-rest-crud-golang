@@ -3,7 +3,6 @@ package model
 import (
 	"encoding/json"
 	"fmt"
-
 )
 
 // Request e Response são usados para comunicação com o mundo externo, enquanto Domain é usado para lógica de negócio interna
@@ -39,4 +38,8 @@ func (ud *userDomain) GetName() string {
 }
 func (ud *userDomain) GetAge() int8 {
 	return ud.Age
+}
+
+func (ud *userDomain) GetId() string {
+	return ud.ID
 }

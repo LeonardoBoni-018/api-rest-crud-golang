@@ -8,6 +8,7 @@ type UserDomainInterface interface {
 	GetJSONValue() (string, error)
 	SetId(string)
 	EncryptPassword()
+	GetId() string
 }
 
 func NewUserDomain(
