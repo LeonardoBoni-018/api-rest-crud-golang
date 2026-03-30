@@ -5,6 +5,7 @@ import (
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/rest_err"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
+
 )
 
 const (
@@ -33,9 +34,9 @@ type UserRepository interface {
 		userDomain model.UserDomainInterface,
 	) *rest_err.RestErr
 
-	// DeleteUser(
-	// 	userId string,
-	// ) *rest_err.RestErr
+	DeleteUser(
+		userId string,
+	) *rest_err.RestErr
 
 	FindUserByEmail(
 		email string,

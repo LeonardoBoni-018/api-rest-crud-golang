@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller"
-
 )
 
 // Inicializa as rotas
