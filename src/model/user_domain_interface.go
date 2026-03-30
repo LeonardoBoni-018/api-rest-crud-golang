@@ -22,3 +22,13 @@ func NewUserDomain(
 		Age:      age,
 	}
 }
+
+func NewUserUpdateDomain(
+	age int8,
+	name string,
+) UserDomainInterface {
+	return &userDomain{
+		Name: name,
+		Age:  age,
+	}
+}
