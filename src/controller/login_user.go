@@ -14,6 +14,10 @@ import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/view"
 )
 
+var (
+	JWT_SECRET_KEY = "JWT_SECRET_KEY"
+)
+
 func (uc *userControllerInterface) LoginUser(c *gin.Context) {
 	loger.Info("Init LoginUser controller",
 		zap.String("journey", "LoginUser"),
