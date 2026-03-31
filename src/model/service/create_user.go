@@ -6,13 +6,18 @@ import (
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/rest_err"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
-
 )
 
 func (ud *userDomainService) CreateUserServices(
 	userDomain model.UserDomainInterface,
 ) *rest_err.RestErr {
 	logger.Info("Init CreateUserDomain", zap.String("journey", "createUser"))
+
+	user, _ := ud.FindUserByEmailServices(userDomain.GetEmail())
+
+	if user != nil {
+		return rest_err.NewBadRequestError("email already exists")
+	}
 
 	userDomain.EncryptPassword()
 
