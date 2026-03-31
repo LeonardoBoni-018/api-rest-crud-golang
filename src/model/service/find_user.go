@@ -6,6 +6,7 @@ import (
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/rest_err"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
+
 )
 
 // func (*userDomainService) FindUserDomain(string) (*model.UserDomainInterface, *rest_err.RestErr) {
@@ -24,4 +25,11 @@ func (ud *userDomainService) FindUserByEmailServices(
 ) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByEmail services", zap.String("journey", "findUserByEmail"))
 	return ud.userRepository.FindUserByEmail(email)
+}
+
+func (ud *userDomainService) findUserByEmailAndPasswordServices(
+	email, password string,
+) (model.UserDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init FindUserByEmailAndPasswordServices ", zap.String("journey", "findUserByEmailAndPassword"))
+	return ud.userRepository.FindUserByEmailAndPassword(email, password)
 }

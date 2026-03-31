@@ -1,8 +1,10 @@
 package controller
 
 import (
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model/service"
 	"github.com/gin-gonic/gin"
+
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model/service"
+
 )
 
 func NewUserControllerInterface(
@@ -19,6 +21,7 @@ type UserControllerInterface interface {
 	FindUserById(c *gin.Context)
 	FindUserByEmail(c *gin.Context)
 	UpdateUser(c *gin.Context)
+	LoginUser(c *gin.Context)
 }
 
 type userControllerInterface struct {

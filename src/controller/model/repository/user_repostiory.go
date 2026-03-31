@@ -5,7 +5,6 @@ import (
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/rest_err"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
-
 )
 
 const (
@@ -41,10 +40,10 @@ type UserRepository interface {
 	FindUserByEmail(
 		email string,
 	) (model.UserDomainInterface, *rest_err.RestErr)
-	// FindUserByEmailAndPassword(
-	// 	email string,
-	// 	password string,
-	// ) (model.UserDomainInterface, *rest_err.RestErr)
+	FindUserByEmailAndPassword(
+		email string,
+		password string,
+	) (model.UserDomainInterface, *rest_err.RestErr)
 	FindUserByID(
 		id string,
 	) (model.UserDomainInterface, *rest_err.RestErr)
