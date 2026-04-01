@@ -1,18 +1,15 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"net/mail"
 
-	"github.com/bytedance/gopkg/util/logger"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/loger"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/rest_err"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/view"
 )
 
@@ -20,12 +17,12 @@ func (uc *userControllerInterface) FindUserById(c *gin.Context) {
 	loger.Info("Init findUserById",
 		zap.String("journey", "findUserById"))
 
-	user, err := model.VerifyToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
-		c.JSON(err.Code, err)
-		return
-	}
-	logger.Info(fmt.Sprintf("User authenticated: %#v", user))
+	// user, err := model.VerifyToken(c.Request.Header.Get("Authorization"))
+	// if err != nil {
+	// 	c.JSON(err.Code, err)
+	// 	return
+	// }
+	// logger.Info(fmt.Sprintf("User authenticated: %#v", user))
 
 	userId := c.Param("userId")
 
@@ -55,12 +52,12 @@ func (uc *userControllerInterface) FindUserByEmail(c *gin.Context) {
 	loger.Info("Init findUserByEmail",
 		zap.String("journey", "findUserByEmail"))
 
-	user, err := model.VerifyToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
-		c.JSON(err.Code, err)
-		return
-	}
-	logger.Info(fmt.Sprintf("User authenticated: %#v", user))
+	// user, err := model.VerifyToken(c.Request.Header.Get("Authorization"))
+	// if err != nil {
+	// 	c.JSON(err.Code, err)
+	// 	return
+	// }
+	// logger.Info(fmt.Sprintf("User authenticated: %#v", user))
 
 	userEmail := c.Param("userEmail")
 
