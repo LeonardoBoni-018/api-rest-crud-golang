@@ -9,7 +9,16 @@ import (
 )
 
 func initDependencies(database *mongo.Database) controller.UserControllerInterface {
-	repo := repository.NewUserRepository(database)
-	service := service.NewUserDomainService(repo)
-	return controller.NewUserControllerInterface(service)
+	userRepo := repository.NewUserRepository(database)
+	userService := service.NewUserDomainService(userRepo)
+
+	businessRepo := repository.NewBusinessRepository(database)
+	businessService := service.NewBusinessService(businessRepo)
+	controller.SetBusinessService(businessService)
+
+	serviceRepo := repository.NewServiceRepository(database)
+	serviceService := service.NewServiceService(serviceRepo)
+	controller.SetServiceService(serviceService)
+
+	return controller.NewUserControllerInterface(userService)
 }

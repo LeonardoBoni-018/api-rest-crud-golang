@@ -3,16 +3,22 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 // Request e Response são usados para comunicação com o mundo externo, enquanto Domain é usado para lógica de negócio interna
-type userDomain struct {
-	ID       string
-	Email    string
-	Password string
-	Name     string
-	Age      int8
+type UserDomain struct {
+	ID        string    `bson:"_id,omitempty" json:"id"`
+	Name      string    `bson:"name" json:"name"`
+	Email     string    `bson:"email" json:"email"`
+	Password  string    `bson:"password" json:"password"`
+	Age       int8      `bson:"age" json:"age"`
+	Role      string    `bson:"role" json:"role"` // customer | business_owner
+	CreatedAt time.Time `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
 }
+
+type userDomain = UserDomain
 
 func (ud *userDomain) SetId(id string) {
 	ud.ID = id
