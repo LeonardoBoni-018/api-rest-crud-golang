@@ -3,12 +3,11 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model/service"
-
+	userapp "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/application/user"
 )
 
 func NewUserControllerInterface(
-	serviceInterface service.UserDomainService,
+	serviceInterface userapp.UserDomainService,
 ) UserControllerInterface {
 	return &userControllerInterface{
 		service: serviceInterface,
@@ -25,5 +24,5 @@ type UserControllerInterface interface {
 }
 
 type userControllerInterface struct {
-	service service.UserDomainService
+	service userapp.UserDomainService
 }

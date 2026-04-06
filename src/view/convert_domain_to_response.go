@@ -2,11 +2,11 @@ package view
 
 import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/model/response"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/user"
 )
 
 func ConvertDomainToResponse(
-	userDomain model.UserDomainInterface,
+	userDomain user.UserDomainInterface,
 ) response.UserResponse {
 	return response.UserResponse{
 		ID:    userDomain.GetId(),
@@ -15,3 +15,5 @@ func ConvertDomainToResponse(
 		Age:   userDomain.GetAge(),
 	}
 }
+
+

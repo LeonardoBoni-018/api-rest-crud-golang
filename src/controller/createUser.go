@@ -10,12 +10,12 @@ import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/loger"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/validation"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/model/request"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/user"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/view"
 )
 
 var (
-	UserDomainInterface model.UserDomainInterface
+	UserDomainInterface user.UserDomainInterface
 )
 
 func (uc *userControllerInterface) CreateUser(c *gin.Context) {
@@ -33,7 +33,7 @@ func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 		return
 	}
 
-	domain := model.NewUserDomain(userRequest.Email, userRequest.Password, userRequest.Name, userRequest.Age)
+	domain := user.NewUserDomain(userRequest.Email, userRequest.Password, userRequest.Name, userRequest.Age)
 	if err := uc.service.CreateUserServices(domain); err != nil {
 		logger.Info("Error trying to call CreateUser", zap.String("journey", "createUser"))
 
@@ -46,3 +46,5 @@ func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 	)
 	c.JSON(http.StatusOK, view.ConvertDomainToResponse(domain))
 }
+
+

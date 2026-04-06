@@ -10,7 +10,7 @@ import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/loger"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/validation"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/model/request"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/user"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/view"
 )
 
@@ -33,7 +33,7 @@ func (uc *userControllerInterface) LoginUser(c *gin.Context) {
 		return
 	}
 
-	domain := model.NewUserLoginDomain(userRequest.Email, userRequest.Password)
+	domain := user.NewUserLoginDomain(userRequest.Email, userRequest.Password)
 	domainUserResult, token, err := uc.service.LoginUserServices(domain)
 	if err != nil {
 		logger.Info("Error trying to call LoginUser", zap.String("journey", "LoginUser"))
@@ -48,3 +48,5 @@ func (uc *userControllerInterface) LoginUser(c *gin.Context) {
 	c.Header("Authorization", token)
 	c.JSON(http.StatusOK, view.ConvertDomainToResponse(domainUserResult))
 }
+
+

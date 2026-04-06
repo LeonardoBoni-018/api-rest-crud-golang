@@ -12,7 +12,7 @@ import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/rest_err"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/configuration/validation"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/controller/model/request"
-	"github.com/LeonardoBoni-018/api-rest-crud-golang/src/model"
+	"github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/user"
 )
 
 func (uc *userControllerInterface) UpdateUser(c *gin.Context) {
@@ -36,7 +36,7 @@ func (uc *userControllerInterface) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	domain := model.NewUserUpdateDomain(userRequest.Age, userRequest.Name)
+	domain := user.NewUserUpdateDomain(userRequest.Age, userRequest.Name)
 	if err := uc.service.UpdateUserDomain(userId, domain); err != nil {
 		logger.Info("Error trying to call UpdateUser", zap.String("journey", "UpdateUser"))
 
@@ -49,3 +49,5 @@ func (uc *userControllerInterface) UpdateUser(c *gin.Context) {
 	)
 	c.Status(http.StatusOK)
 }
+
+

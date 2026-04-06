@@ -76,3 +76,4 @@ func NewForbiddenError(message string) *RestErr {
 		Code:    http.StatusForbidden,
 	}
 }
+

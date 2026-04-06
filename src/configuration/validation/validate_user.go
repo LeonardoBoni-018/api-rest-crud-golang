@@ -55,3 +55,4 @@ func ValidateUserError(validation_err error) *rest_err.RestErr {
 		return rest_err.NewBadRequestError("Error trying to convert fields")
 	}
 }
+

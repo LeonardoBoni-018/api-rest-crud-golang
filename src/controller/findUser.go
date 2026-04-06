@@ -17,7 +17,7 @@ func (uc *userControllerInterface) FindUserById(c *gin.Context) {
 	loger.Info("Init findUserById",
 		zap.String("journey", "findUserById"))
 
-	// user, err := model.VerifyToken(c.Request.Header.Get("Authorization"))
+	// user, err := user.VerifyToken(c.Request.Header.Get("Authorization"))
 	// if err != nil {
 	// 	c.JSON(err.Code, err)
 	// 	return
@@ -52,7 +52,7 @@ func (uc *userControllerInterface) FindUserByEmail(c *gin.Context) {
 	loger.Info("Init findUserByEmail",
 		zap.String("journey", "findUserByEmail"))
 
-	// user, err := model.VerifyToken(c.Request.Header.Get("Authorization"))
+	// user, err := user.VerifyToken(c.Request.Header.Get("Authorization"))
 	// if err != nil {
 	// 	c.JSON(err.Code, err)
 	// 	return
@@ -82,3 +82,5 @@ func (uc *userControllerInterface) FindUserByEmail(c *gin.Context) {
 		zap.String("journey", "findUserByEmail"))
 	c.JSON(http.StatusOK, view.ConvertDomainToResponse(userDomain))
 }
+
+

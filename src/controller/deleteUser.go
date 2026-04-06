@@ -36,3 +36,4 @@ func (uc *userControllerInterface) DeleteUser(c *gin.Context) {
 	)
 	c.Status(http.StatusOK)
 }
+

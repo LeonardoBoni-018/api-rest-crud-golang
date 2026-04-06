@@ -31,3 +31,4 @@ func NewMongoDBConnection(ctx context.Context) (*mongo.Database, error) {
 
 	return client.Database(mongodb_database), nil
 }
+
