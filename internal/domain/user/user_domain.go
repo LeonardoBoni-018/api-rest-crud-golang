@@ -45,3 +45,11 @@ func (ud *userDomain) GetAge() int8 {
 func (ud *userDomain) GetId() string {
 	return ud.ID
 }
+
+func (ud *userDomain) GetTenantID() string {
+	return ud.TenantID
+}
+
+func (ud *userDomain) SetTenantID(tenantID string) {
+	ud.TenantID = tenantID
+}

@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytedance/gopkg/util/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 
@@ -21,11 +20,12 @@ func (ud *userDomain) GenerateToken() (string, *rest_err.RestErr) {
 	secret := os.Getenv(JWT_SECRET_KEY)
 
 	claims := jwt.MapClaims{
-		"id":    ud.ID,
-		"email": ud.Email,
-		"name":  ud.Name,
-		"age":   ud.Age,
-		"exp":   time.Now().Add(time.Hour * 24).Unix(), // Token expira em 24 horas
+		"id":        ud.ID,
+		"email":     ud.Email,
+		"name":      ud.Name,
+		"age":       ud.Age,
+		"tenant_id": ud.TenantID,
+		"exp":       time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -81,10 +81,8 @@ func RemoveBearerPrefix(token string) string {
 	}
 	return token
 }
-
 func VerifyTokenMiddleware(c *gin.Context) {
 	secret := os.Getenv(JWT_SECRET_KEY)
-
 	tokenValue := RemoveBearerPrefix(c.Request.Header.Get("Authorization"))
 
 	token, err := jwt.Parse(tokenValue, func(t *jwt.Token) (interface{}, error) {
@@ -109,14 +107,38 @@ func VerifyTokenMiddleware(c *gin.Context) {
 		return
 	}
 
-	userDomain := &userDomain{
-		ID:    claims["id"].(string),
-		Email: claims["email"].(string),
-		Name:  claims["name"].(string),
-		Age:   int8(claims["age"].(float64)),
+	ageFloat, ok := claims["age"].(float64)
+	if !ok {
+		errRest := rest_err.NewUnauthorizedError("Invalid token: age claim type")
+		c.JSON(errRest.Code, errRest)
+		c.Abort()
+		return
 	}
 
-	logger.Info(fmt.Sprintf("User authenticated: %#v", userDomain))
+	// Extrair tenant_id
+	tenantID := ""
+	if tID, ok := claims["tenant_id"].(string); ok {
+		tenantID = tID
+	}
+
+	fmt.Printf("DEBUG - tenant_id from JWT: '%s'\n", tenantID)
+	if tenantID == "" {
+		errRest := rest_err.NewBadRequestError("tenant_id not found in token - please register a tenant first")
+		c.JSON(errRest.Code, errRest)
+		c.Abort()
+		return
+	}
+
+	userDomain := &userDomain{
+		ID:       claims["id"].(string),
+		Email:    claims["email"].(string),
+		Name:     claims["name"].(string),
+		Age:      int8(ageFloat),
+		TenantID: tenantID,
+	}
+
 	c.Set("user", userDomain)
+	c.Set("user_id", userDomain.ID)
+	c.Set("tenant_id", userDomain.TenantID)
 	c.Next()
 }

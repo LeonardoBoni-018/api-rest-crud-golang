@@ -28,14 +28,13 @@ func main() {
 		return
 	}
 
-	userController := initDependencies(database)
+	userController, tenantController := initDependencies(database)
 
 	router := gin.Default()
 	// Inicializa as rotas
-	routes.InitRoutes(&router.RouterGroup, userController)
+	routes.InitRoutes(&router.RouterGroup, userController, tenantController)
 	// Inicializa o servidor
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal("Error running server", err)
 	}
 }
-

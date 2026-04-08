@@ -7,8 +7,10 @@ type UserDomainInterface interface {
 	GetPassword() string
 	GetName() string
 	GetAge() int8
+	GetTenantID() string
 	GetJSONValue() (string, error)
 	SetId(string)
+	SetTenantID(string)
 	EncryptPassword()
 	GetId() string
 	GenerateToken() (string, *rest_err.RestErr)

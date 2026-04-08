@@ -16,5 +16,6 @@ func ConvertEntityToDomain(
 	)
 
 	domain.SetId(entity.ID.Hex())
+	domain.SetTenantID(entity.TenantID)
 	return domain
 }
