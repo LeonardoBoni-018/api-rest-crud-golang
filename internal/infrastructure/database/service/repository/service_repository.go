@@ -15,7 +15,6 @@ import (
 	domain "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/service"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/service/repository/entity"
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/service/repository/entity/converter"
-
 )
 
 const serviceColletionEnv = "MONGODB_SERVICE_COLLECTION"
@@ -45,7 +44,7 @@ func (r *serviceRepository) CreateService(s *domain.Service) (*domain.Service, *
 	s.CreatedAt = time.Now()
 	s.UpdatedAt = time.Now()
 
-	result, err := r.colletion().InsertOne(context.Background(), s)
+	result, err := r.colletion().InsertOne(context.Background(), converter.ToEntity(s))
 
 	if err != nil {
 		logger.Error("Error trying to insert service", err, zap.String("journey", "createService"))

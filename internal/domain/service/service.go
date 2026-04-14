@@ -3,7 +3,7 @@ package service
 import "time"
 
 type Service struct {
-	ID          string    `json:"id" bson:"_id"`
+	ID          string    `json:"id" bson:"_id,omitempty"`
 	TenantID    string    `json:"tenant_id" bson:"tenant_id"`
 	Name        string    `json:"name" bson:"name"`
 	Description string    `json:"description" bson:"description"`

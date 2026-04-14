@@ -21,8 +21,11 @@ func ToEntity(domain *service.Service) *entity.ServiceEntity {
 	}
 
 	if domain.ID != "" {
-		objectID, _ := primitive.ObjectIDFromHex(domain.ID)
-		entity.ID = objectID
+		objectID, err := primitive.ObjectIDFromHex(domain.ID)
+		if err == nil {
+			entity.ID = objectID
+		}
 	}
+	
 	return entity
 }
