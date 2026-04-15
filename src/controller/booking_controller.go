@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -16,6 +17,7 @@ type BookingControllerInterface interface {
 	CreateBooking(c *gin.Context)
 	ListBookings(c *gin.Context)
 	GetBookingByID(c *gin.Context)
+	GetAvailability(c *gin.Context)
 }
 
 type bookingController struct {
@@ -74,4 +76,31 @@ func (bc *bookingController) GetBookingByID(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.BookingResponse{Booking: bookingModel})
+}
+
+func (bc *bookingController) GetAvailability(c *gin.Context) {
+	var req request.AvailabilityRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, rest_err.NewBadRequestError(err.Error()))
+		return
+	}
+
+	date, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, rest_err.NewBadRequestError("invalid date format, expected YYYY-MM-DD"))
+		return
+	}
+
+	tenantID := c.GetString("tenant_id")
+	slots, restErr := bc.booking.GetAvailableSlots(tenantID, req.ServiceID, date)
+	if restErr != nil {
+		c.JSON(restErr.Code, restErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.AvailabilityResponse{
+		ServiceID: req.ServiceID,
+		Date:      req.Date,
+		Slots:     slots,
+	})
 }

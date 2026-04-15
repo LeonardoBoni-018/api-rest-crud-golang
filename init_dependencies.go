@@ -29,7 +29,7 @@ func initDependencies(database *mongo.Database) (
 	tenantService := tenantapp.NewTenantService(tenantRepo)
 	tenantOnboarding := tenantapp.NewTenantOnboardingService(tenantRepo, userRepo)
 	serviceService := serviceapp.NewServiceService(serviceRepo)
-	bookingService := bookingapp.NewBookingService(bookingRepo)
+	bookingService := bookingapp.NewBookingService(bookingRepo, tenantRepo, serviceRepo)
 
 	return controller.NewUserControllerInterface(userService),
 		controller.NewTenantController(tenantService, tenantOnboarding),
