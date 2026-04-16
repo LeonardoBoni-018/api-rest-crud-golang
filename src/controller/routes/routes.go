@@ -36,6 +36,11 @@ func InitRoutes(
 	r.GET("/bookings", user.VerifyTokenMiddleware, bookingController.ListBookings)
 	r.GET("/bookings/:bookingId", user.VerifyTokenMiddleware, bookingController.GetBookingByID)
 	r.GET("/bookings/availability", user.VerifyTokenMiddleware, bookingController.GetAvailability)
+	r.PUT("/bookings/:bookingId/status", user.VerifyTokenMiddleware, bookingController.UpdateBookingStatus)
+
+	r.GET("/tenants/:slug/services", bookingController.GetServicesByTenantSlug)
+	r.GET("/tenants/:slug/services/:serviceId/availability", bookingController.GetAvailabilityByTenantSlug)
+	r.POST("/tenants/:slug/bookings", bookingController.CreateBookingForTenantSlug)
 
 	r.GET("/dashboard/metrics", user.VerifyTokenMiddleware, dashboardController.GetMetrics)
 }

@@ -31,6 +31,7 @@ type BookingRepository interface {
 	CreateBooking(booking *domain.Booking) (*domain.Booking, *rest_err.RestErr)
 	FindBookingsByTenantID(tenantID string) ([]*domain.Booking, *rest_err.RestErr)
 	FindBookingByID(id string) (*domain.Booking, *rest_err.RestErr)
+	UpdateBooking(booking *domain.Booking) (*domain.Booking, *rest_err.RestErr)
 }
 
 func (r *bookingRepository) collection() *mongo.Collection {
@@ -87,4 +88,39 @@ func (r *bookingRepository) FindBookingByID(id string) (*domain.Booking, *rest_e
 		return nil, rest_err.NewInternalServerError(err.Error())
 	}
 	return converter.ToDomain(*doc), nil
+}
+
+func (r *bookingRepository) UpdateBooking(b *domain.Booking) (*domain.Booking, *rest_err.RestErr) {
+	objID, err := primitive.ObjectIDFromHex(b.ID)
+	if err != nil {
+		return nil, rest_err.NewBadRequestError("Invalid booking ID")
+	}
+
+	b.UpdatedAt = time.Now()
+	update := bson.M{
+		"tenant_id":      b.TenantID,
+		"service_id":     b.ServiceID,
+		"customer_id":    b.CustomerID,
+		"date":           b.Date,
+		"time_slot":      b.TimeSlot,
+		"duration":       b.Duration,
+		"status":         b.Status,
+		"customer_name":  b.CustomerName,
+		"customer_phone": b.CustomerPhone,
+		"customer_email": b.CustomerEmail,
+		"notes":          b.Notes,
+		"created_at":     b.CreatedAt,
+		"updated_at":     b.UpdatedAt,
+	}
+
+	_, err = r.collection().UpdateOne(
+		context.Background(),
+		bson.D{{Key: "_id", Value: objID}},
+		bson.D{{Key: "$set", Value: update}},
+	)
+	if err != nil {
+		return nil, rest_err.NewInternalServerError(err.Error())
+	}
+
+	return b, nil
 }
