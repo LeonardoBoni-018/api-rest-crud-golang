@@ -13,6 +13,7 @@ func InitRoutes(
 	tenantController controller.TenantControllerInterface,
 	serviceController controller.ServiceControllerInterface,
 	bookingController controller.BookingControllerInterface,
+	dashboardController controller.DashboardControllerInterface,
 ) {
 
 	r.GET("/getUserById/:userId", user.VerifyTokenMiddleware, userController.FindUserById)
@@ -34,6 +35,7 @@ func InitRoutes(
 	r.POST("/bookings", user.VerifyTokenMiddleware, bookingController.CreateBooking)
 	r.GET("/bookings", user.VerifyTokenMiddleware, bookingController.ListBookings)
 	r.GET("/bookings/:bookingId", user.VerifyTokenMiddleware, bookingController.GetBookingByID)
-
 	r.GET("/bookings/availability", user.VerifyTokenMiddleware, bookingController.GetAvailability)
+
+	r.GET("/dashboard/metrics", user.VerifyTokenMiddleware, dashboardController.GetMetrics)
 }

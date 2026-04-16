@@ -4,6 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	bookingapp "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/application/booking"
+	dashboardapp "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/application/dashboard"
 	serviceapp "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/application/service"
 	tenantapp "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/application/tenant"
 	userapp "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/application/user"
@@ -19,6 +20,7 @@ func initDependencies(database *mongo.Database) (
 	controller.TenantControllerInterface,
 	controller.ServiceControllerInterface,
 	controller.BookingControllerInterface,
+	controller.DashboardControllerInterface,
 ) {
 	tenantRepo := tenantrepo.NewTenantRepository(database)
 	userRepo := userrepo.NewUserRepository(database)
@@ -30,9 +32,11 @@ func initDependencies(database *mongo.Database) (
 	tenantOnboarding := tenantapp.NewTenantOnboardingService(tenantRepo, userRepo)
 	serviceService := serviceapp.NewServiceService(serviceRepo)
 	bookingService := bookingapp.NewBookingService(bookingRepo, tenantRepo, serviceRepo)
+	dashboardService := dashboardapp.NewDashboardService(bookingRepo, serviceRepo)
 
 	return controller.NewUserControllerInterface(userService),
 		controller.NewTenantController(tenantService, tenantOnboarding),
 		controller.NewServiceController(serviceService),
-		controller.NewBookingController(bookingService)
+		controller.NewBookingController(bookingService),
+		controller.NewDashboardController(dashboardService)
 }
