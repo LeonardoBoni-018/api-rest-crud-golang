@@ -43,4 +43,6 @@ func InitRoutes(
 	r.POST("/tenants/:slug/bookings", bookingController.CreateBookingForTenantSlug)
 
 	r.GET("/dashboard/metrics", user.VerifyTokenMiddleware, dashboardController.GetMetrics)
+	r.GET("/dashboard/calendar", user.VerifyTokenMiddleware, dashboardController.GetCalendar)
+	r.GET("/dashboard/reports", user.VerifyTokenMiddleware, dashboardController.GetReports)
 }

@@ -9,6 +9,8 @@ import (
 
 type DashboardService interface {
 	GetMetrics(tenantID string) (*dashboarddomain.DashboardMetrics, *rest_err.RestErr)
+	GetCalendar(tenantID string) (*dashboarddomain.DashboardCalendar, *rest_err.RestErr)
+	GetReports(tenantID string) (*dashboarddomain.DashboardReports, *rest_err.RestErr)
 }
 
 type dashboardService struct {

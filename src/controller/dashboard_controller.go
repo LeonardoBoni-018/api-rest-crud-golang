@@ -11,6 +11,8 @@ import (
 
 type DashboardControllerInterface interface {
 	GetMetrics(c *gin.Context)
+	GetCalendar(c *gin.Context)
+	GetReports(c *gin.Context)
 }
 
 type dashboardController struct {
@@ -30,4 +32,26 @@ func (dc *dashboardController) GetMetrics(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response.DashboardMetricsResponse{Metrics: metrics})
+}
+
+func (dc *dashboardController) GetCalendar(c *gin.Context) {
+	tenantID := c.GetString("tenant_id")
+	calendar, err := dc.dashboard.GetCalendar(tenantID)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DashboardCalendarResponse{Calendar: calendar})
+}
+
+func (dc *dashboardController) GetReports(c *gin.Context) {
+	tenantID := c.GetString("tenant_id")
+	reports, err := dc.dashboard.GetReports(tenantID)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DashboardReportsResponse{Reports: reports})
 }

@@ -96,3 +96,143 @@ func getServiceName(serviceMap map[string]*servicedomain.Service, serviceID stri
 	}
 	return ""
 }
+
+func (s *dashboardService) GetCalendar(tenantID string) (*dashboarddomain.DashboardCalendar, *rest_err.RestErr) {
+	bookings, err := s.bookingRepository.FindBookingsByTenantID(tenantID)
+	if err != nil {
+		return nil, err
+	}
+
+	services, err := s.serviceRepository.FindServicesByTenantID(tenantID)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceMap := make(map[string]*servicedomain.Service, len(services))
+	for _, service := range services {
+		serviceMap[service.ID] = service
+	}
+
+	var events []dashboarddomain.DashboardCalendarEvent
+	now := time.Now()
+
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	for _, booking := range bookings {
+		bookingTime, errParse := time.Parse("2006-01-02 15:04", booking.Date+" "+booking.TimeSlot)
+		if errParse != nil {
+			continue
+		}
+
+		if bookingTime.Before(today) {
+			continue
+		}
+
+		events = append(events, dashboarddomain.DashboardCalendarEvent{
+			BookingID:     booking.ID,
+			Date:          booking.Date,
+			TimeSlot:      booking.TimeSlot,
+			Duration:      booking.Duration,
+			Status:        booking.Status,
+			ServiceName:   getServiceName(serviceMap, booking.ServiceID),
+			CustomerName:  booking.CustomerName,
+			CustomerPhone: booking.CustomerPhone,
+			Revenue:       getServicePrice(serviceMap, booking.ServiceID),
+		})
+	}
+
+	sort.Slice(events, func(i, j int) bool {
+		left := events[i].Date + " " + events[i].TimeSlot
+		right := events[j].Date + " " + events[j].TimeSlot
+		return left < right
+	})
+
+	return &dashboarddomain.DashboardCalendar{Events: events}, nil
+}
+
+func (s *dashboardService) GetReports(tenantID string) (*dashboarddomain.DashboardReports, *rest_err.RestErr) {
+	bookings, err := s.bookingRepository.FindBookingsByTenantID(tenantID)
+	if err != nil {
+		return nil, err
+	}
+
+	services, err := s.serviceRepository.FindServicesByTenantID(tenantID)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceMap := make(map[string]*servicedomain.Service, len(services))
+	for _, service := range services {
+		serviceMap[service.ID] = service
+	}
+
+	statusCounts := map[string]int{}
+	revenueByService := map[string]*dashboarddomain.ReportRevenueByService{}
+	dailyStats := map[string]*dashboarddomain.DailyBooking{}
+	sevenDays := time.Now().AddDate(0, 0, -6)
+
+	for _, booking := range bookings {
+		status := strings.ToLower(strings.TrimSpace(booking.Status))
+		statusCounts[status]++
+
+		price := getServicePrice(serviceMap, booking.ServiceID)
+		if _, ok := revenueByService[booking.ServiceID]; !ok {
+			revenueByService[booking.ServiceID] = &dashboarddomain.ReportRevenueByService{
+				ServiceID: booking.ServiceID,
+				Name:      getServiceName(serviceMap, booking.ServiceID),
+			}
+		}
+
+		if status != "cancelled" {
+			revenueByService[booking.ServiceID].BookingsCount++
+			revenueByService[booking.ServiceID].Revenue += price
+		}
+
+		bookingDate, errParse := time.Parse(dateLayout, booking.Date)
+		if errParse != nil {
+			continue
+		}
+
+		if bookingDate.After(sevenDays) || bookingDate.Equal(sevenDays) {
+			key := bookingDate.Format(dateLayout)
+			if _, ok := dailyStats[key]; !ok {
+				dailyStats[key] = &dashboarddomain.DailyBooking{Date: key}
+			}
+			dailyStats[key].Bookings++
+			if status != "cancelled" {
+				dailyStats[key].Revenue += price
+			}
+		}
+	}
+
+	var statusSummary []dashboarddomain.ReportStatus
+	for status, count := range statusCounts {
+		statusSummary = append(statusSummary, dashboarddomain.ReportStatus{Status: status, Count: count})
+	}
+
+	var revenueSummary []dashboarddomain.ReportRevenueByService
+	for _, item := range revenueByService {
+		revenueSummary = append(revenueSummary, *item)
+	}
+
+	var dailyBookings []dashboarddomain.DailyBooking
+	for _, item := range dailyStats {
+		dailyBookings = append(dailyBookings, *item)
+	}
+
+	sort.Slice(statusSummary, func(i, j int) bool {
+		return statusSummary[i].Count > statusSummary[j].Count
+	})
+	sort.Slice(revenueSummary, func(i, j int) bool {
+		return revenueSummary[i].Revenue > revenueSummary[j].Revenue
+	})
+	sort.Slice(dailyBookings, func(i, j int) bool {
+		return dailyBookings[i].Date < dailyBookings[j].Date
+	})
+
+	return &dashboarddomain.DashboardReports{
+		TotalBookings:    len(bookings),
+		StatusSummary:    statusSummary,
+		RevenueByService: revenueSummary,
+		DailyBookings:    dailyBookings,
+	}, nil
+}
