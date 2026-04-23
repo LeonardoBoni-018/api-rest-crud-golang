@@ -1,0 +1,188 @@
+{
+	"info": {
+		"name": "Scheduler SaaS - Chat IA Groq",
+		"description": "Collection para testar Chat IA com Groq",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "tenantSlug",
+			"value": "barbearia-joao",
+			"type": "string"
+		},
+		{
+			"key": "conversationId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Chat - Iniciar Conversa",
+			"request": {
+				"method": "POST",
+				"url": {
+					"raw": "{{baseUrl}}/chat/{{tenantSlug}}/conversations",
+					"path": ["chat", "{{tenantSlug}}", "conversations"]
+				},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customer_id\": \"cliente-001\",\n  \"message\": \"Olá, bom dia!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200 || pm.response.code === 201) {",
+							"    const jsonData = pm.response.json();",
+							"    if (jsonData.id) {",
+							"        pm.collectionVariables.set('conversationId', jsonData.id);",
+							"        console.log('Conversation ID:', jsonData.id);",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Chat - Enviar Mensagem",
+			"request": {
+				"method": "POST",
+				"url": {
+					"raw": "{{baseUrl}}/chat/{{tenantSlug}}/messages",
+					"path": ["chat", "{{tenantSlug}}", "messages"]
+				},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"conversation_id\": \"{{conversationId}}\",\n  \"message\": \"Quais serviços vocês oferecem?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				}
+			}
+		},
+		{
+			"name": "3. Chat - Perguntar Horários",
+			"request": {
+				"method": "POST",
+				"url": {
+					"raw": "{{baseUrl}}/chat/{{tenantSlug}}/messages",
+					"path": ["chat", "{{tenantSlug}}", "messages"]
+				},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"conversation_id\": \"{{conversationId}}\",\n  \"message\": \"Tem horário disponível para amanhã?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				}
+			}
+		},
+		{
+			"name": "4. Chat - Ver Histórico",
+			"request": {
+				"method": "GET",
+				"url": {
+					"raw": "{{baseUrl}}/chat/{{tenantSlug}}/conversations/{{conversationId}}",
+					"path": ["chat", "{{tenantSlug}}", "conversations", "{{conversationId}}"]
+				}
+			}
+		},
+		{
+			"name": "5. Chat - Listar Conversas",
+			"request": {
+				"method": "GET",
+				"url": {
+					"raw": "{{baseUrl}}/chat/{{tenantSlug}}/conversations",
+					"path": ["chat", "{{tenantSlug}}", "conversations"]
+				}
+			}
+		},
+		{
+			"name": "Criar Tenant (Exemplo)",
+			"request": {
+				"method": "POST",
+				"url": {
+					"raw": "{{baseUrl}}/tenants/register",
+					"path": ["tenants", "register"]
+				},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Barbearia do João\",\n  \"slug\": \"barbearia-joao\",\n  \"email\": \"joao@barbearia.com\",\n  \"phone\": \"+5511999999999\",\n  \"password\": \"senha123\",\n  \"settings\": {\n    \"business_type\": \"barbershop\",\n    \"working_days\": [\"mon\", \"tue\", \"wed\", \"thu\", \"fri\"],\n    \"working_hours\": \"09:00-18:00\",\n    \"booking_interval\": 30\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				}
+			}
+		},
+		{
+			"name": "Criar Serviço (Exemplo)",
+			"request": {
+				"method": "POST",
+				"url": {
+					"raw": "{{baseUrl}}/services",
+					"path": ["services"]
+				},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Corte Masculino\",\n  \"description\": \"Corte masculino com máquina e tesoura\",\n  \"duration\": 30,\n  \"price\": 35.00,\n  \"is_active\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				}
+			}
+		}
+	]
+}
