@@ -14,6 +14,7 @@ func InitRoutes(
 	serviceController controller.ServiceControllerInterface,
 	bookingController controller.BookingControllerInterface,
 	dashboardController controller.DashboardControllerInterface,
+	chatController controller.ChatControllerInterface,
 ) {
 
 	r.GET("/getUserById/:userId", user.VerifyTokenMiddleware, userController.FindUserById)
@@ -45,4 +46,10 @@ func InitRoutes(
 	r.GET("/dashboard/metrics", user.VerifyTokenMiddleware, dashboardController.GetMetrics)
 	r.GET("/dashboard/calendar", user.VerifyTokenMiddleware, dashboardController.GetCalendar)
 	r.GET("/dashboard/reports", user.VerifyTokenMiddleware, dashboardController.GetReports)
+
+	r.GET("/chat/:slug/conversations", chatController.ListConversations)
+	r.POST("/chat/:slug/conversations", chatController.StartConversation)
+	r.POST("/chat/:slug/messages", chatController.SendMessage)
+	r.POST("/chat/:slug/conversations/:conversationId/messages", chatController.SendMessage)
+	r.GET("/chat/:slug/conversations/:conversationId", chatController.GetConversation)
 }

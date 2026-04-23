@@ -5,13 +5,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 )
 
 type OpenAIClient struct {
-	apiKey     string
-	httpClient *http.Client
+	apiKey      string
+	httpClient  *http.Client
+	useFreeMode bool
 }
 
 type OpenAIRequest struct {
@@ -35,15 +39,21 @@ type OpenAIResponse struct {
 }
 
 func NewOpenAIClient(apiKey string) *OpenAIClient {
+	mode := strings.ToLower(strings.TrimSpace(os.Getenv("AI_MODE")))
 	return &OpenAIClient{
 		apiKey: apiKey,
 		httpClient: &http.Client{
 			Timeout: 15 * time.Second,
 		},
+		useFreeMode: apiKey == "" || mode != "paid",
 	}
 }
 
 func (c *OpenAIClient) Chat(ctx context.Context, messages []MessageBody) (string, error) {
+	if c.useFreeMode {
+		return c.freeChatResponse(messages)
+	}
+
 	requestBody := OpenAIRequest{
 		Model:     "gpt-3.5-turbo",
 		Messages:  messages,
@@ -69,6 +79,11 @@ func (c *OpenAIClient) Chat(ctx context.Context, messages []MessageBody) (string
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		data, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("openai status=%d body=%s", resp.StatusCode, string(data))
+	}
+
 	var result OpenAIResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return "", err
@@ -79,4 +94,33 @@ func (c *OpenAIClient) Chat(ctx context.Context, messages []MessageBody) (string
 	}
 
 	return result.Choices[0].Message.Content, nil
+}
+
+func (c *OpenAIClient) freeChatResponse(messages []MessageBody) (string, error) {
+	lastUserMessage := ""
+	for i := len(messages) - 1; i >= 0; i-- {
+		if messages[i].Role == "user" {
+			lastUserMessage = strings.TrimSpace(messages[i].Content)
+			break
+		}
+	}
+
+	if lastUserMessage == "" {
+		return "Olá! Estou em modo gratuito de IA e posso ajudar com serviços, horários e agendamentos. Como posso ajudar você hoje?", nil
+	}
+
+	lower := strings.ToLower(lastUserMessage)
+
+	switch {
+	case strings.Contains(lower, "horário") || strings.Contains(lower, "horarios") || strings.Contains(lower, "agendamento") || strings.Contains(lower, "disponível"):
+		return "Estou em modo gratuito e posso ajudar com informações sobre horários e agendamentos. Qual serviço você deseja agendar e para qual dia?", nil
+	case strings.Contains(lower, "preço") || strings.Contains(lower, "valor") || strings.Contains(lower, "custo"):
+		return "Estou em modo gratuito e posso fornecer valores aproximados. Qual serviço você quer saber o preço?", nil
+	case strings.Contains(lower, "serviço") || strings.Contains(lower, "corte") || strings.Contains(lower, "barbeiro") || strings.Contains(lower, "salão"):
+		return "No modo gratuito, posso responder sobre serviços disponíveis e suas características. Qual serviço você gostaria de conhecer?", nil
+	case strings.Contains(lower, "oi") || strings.Contains(lower, "olá") || strings.Contains(lower, "ola"):
+		return "Olá! Estou usando o modo gratuito de IA. Posso ajudar com serviços, horários e agendamentos para o seu negócio.", nil
+	default:
+		return "Estou rodando em modo gratuito. Posso ajudar com serviços, horários e agendamentos. Como posso ajudar hoje?", nil
+	}
 }
