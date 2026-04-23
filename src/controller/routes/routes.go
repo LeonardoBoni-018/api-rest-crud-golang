@@ -42,6 +42,8 @@ func InitRoutes(
 	r.GET("/tenants/:slug/services", bookingController.GetServicesByTenantSlug)
 	r.GET("/tenants/:slug/services/:serviceId/availability", bookingController.GetAvailabilityByTenantSlug)
 	r.POST("/tenants/:slug/bookings", bookingController.CreateBookingForTenantSlug)
+	r.GET("/tenants/:slug/info", bookingController.GetTenantPublicInfo)
+	r.POST("/tenants/:slug/cancel/:bookingId", bookingController.CancelBookingPublic)
 
 	r.GET("/dashboard/metrics", user.VerifyTokenMiddleware, dashboardController.GetMetrics)
 	r.GET("/dashboard/calendar", user.VerifyTokenMiddleware, dashboardController.GetCalendar)

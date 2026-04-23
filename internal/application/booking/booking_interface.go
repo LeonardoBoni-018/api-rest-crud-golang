@@ -6,6 +6,7 @@ import (
 	"github.com/LeonardoBoni-018/api-rest-crud-golang/configuration/rest_err"
 	domain "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/booking"
 	servicedomain "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/service"
+	tenantdomain "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/domain/tenant"
 	bookingRepo "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/booking/repository"
 	serviceRepo "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/service/repository"
 	tenantRepo "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/tenant/repository"
@@ -20,6 +21,8 @@ type BookingService interface {
 	GetAvailabilityByTenantSlug(string, string, time.Time) ([]string, *rest_err.RestErr)
 	CreateBookingForTenantSlug(string, *domain.Booking) (*domain.Booking, *rest_err.RestErr)
 	UpdateBookingStatus(string, string, string) (*domain.Booking, *rest_err.RestErr)
+	GetTenantPublicInfo(string) (*tenantdomain.Tenant, *rest_err.RestErr)
+	CancelBookingWithToken(string, string) (*domain.Booking, *rest_err.RestErr)
 }
 
 type bookingService struct {

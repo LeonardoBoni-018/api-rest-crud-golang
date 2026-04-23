@@ -1,0 +1,535 @@
+{
+	"info": {
+		"name": "Scheduler SaaS - API Completa",
+		"description": "Collection completa para testar a API do Scheduler SaaS - Agendamento com IA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "tenantSlug",
+			"value": "barbearia-joao",
+			"type": "string"
+		},
+		{
+			"key": "serviceId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cancelToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "conversationId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "AUTH - Autenticação",
+			"item": [
+				{
+					"name": "1. Registrar Empresa (Tenant)",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/tenants/register",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Barbearia do João\",\n  \"slug\": \"{{tenantSlug}}\",\n  \"email\": \"contato@barbearia.com\",\n  \"phone\": \"+5511999999999\",\n  \"business_type\": \"barbershop\",\n  \"working_days\": [\"mon\", \"tue\", \"wed\", \"thu\", \"fri\"],\n  \"working_hours\": \"09:00-18:00\",\n  \"booking_interval\": 30,\n  \"max_advance_days\": 30,\n  \"owner_name\": \"João Silva\",\n  \"owner_email\": \"joao@barbearia.com\",\n  \"owner_password\": \"Senha@123\",\n  \"owner_phone\": \"+5511999999999\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.collectionVariables.set('token', jsonData.token);",
+									"        console.log('Token:', jsonData.token);",
+									"    }",
+									"    if (jsonData.tenant && jsonData.tenant.id) {",
+									"        pm.collectionVariables.set('tenantSlug', jsonData.tenant.slug);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "2. Login",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/login",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"joao@barbearia.com\",\n  \"password\": \"Senha@123\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('userId', jsonData.id);",
+									"    }",
+									"}",
+									"",
+									"const response = pm.response;",
+									"pm.test('Content-Type is JSON', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "TENANT - Gestão de Empresa",
+			"item": [
+				{
+					"name": "1. Ver Minha Empresa",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/tenants/me"
+					}
+				},
+				{
+					"name": "2. Atualizar Configurações",
+					"request": {
+						"method": "PATCH",
+						"url": "{{baseUrl}}/tenants/settings",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"business_type\": \"barbershop\",\n  \"working_days\": [\"mon\", \"tue\", \"wed\", \"thu\", \"fri\", \"sat\"],\n  \"working_hours\": \"08:00-19:00\",\n  \"booking_interval\": 30,\n  \"max_advance_days\": 60\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "SERVICES - Serviços",
+			"item": [
+				{
+					"name": "1. Criar Serviço",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/services",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Corte Masculino\",\n  \"description\": \"Corte masculino com máquina e tesoura\",\n  \"duration\": 30,\n  \"price\": 35.00,\n  \"is_active\": true\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('serviceId', jsonData.id);",
+									"        console.log('Service ID:', jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "2. Listar Serviços",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/services"
+					}
+				},
+				{
+					"name": "3. Atualizar Serviço",
+					"request": {
+						"method": "PUT",
+						"url": "{{baseUrl}}/services/{{serviceId}}",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Corte Masculino Premium\",\n  \"description\": \"Corte premium com Navalhete\",\n  \"duration\": 45,\n  \"price\": 50.00,\n  \"is_active\": true\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					}
+				},
+				{
+					"name": "4. Deletar Serviço",
+					"request": {
+						"method": "DELETE",
+						"url": "{{baseUrl}}/services/{{serviceId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "BOOKINGS - Agendamentos (Auth)",
+			"item": [
+				{
+					"name": "1. Criar Agendamento (interno)",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/bookings",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"date\": \"2024-03-15\",\n  \"time_slot\": \"14:00\",\n  \"duration\": 30,\n  \"customer_name\": \"Maria Santos\",\n  \"customer_phone\": \"+5511988888888\",\n  \"customer_email\": \"maria@email.com\",\n  \"notes\": \"Cliente preferida\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.booking && jsonData.booking.id) {",
+									"        pm.collectionVariables.set('bookingId', jsonData.booking.id);",
+									"        pm.collectionVariables.set('cancelToken', jsonData.booking.cancel_token);",
+									"        console.log('Booking ID:', jsonData.booking.id);",
+									"        console.log('Cancel Token:', jsonData.booking.cancel_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "2. Listar Agendamentos",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/bookings"
+					}
+				},
+				{
+					"name": "3. Ver Agendamento",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/bookings/{{bookingId}}"
+					}
+				},
+				{
+					"name": "4. Disponibilidade",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/bookings/availability?service_id={{serviceId}}&date=2024-03-15",
+							"query": [
+								{"key": "service_id", "value": "{{serviceId}}"},
+								{"key": "date", "value": "2024-03-15"}
+							]
+						}
+					}
+				},
+				{
+					"name": "5. Atualizar Status",
+					"request": {
+						"method": "PUT",
+						"url": "{{baseUrl}}/bookings/{{bookingId}}/status",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"confirmed\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "PUBLIC - Agendamento Público",
+			"item": [
+				{
+					"name": "1. Info do Negócio",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/tenants/{{tenantSlug}}/info"
+					}
+				},
+				{
+					"name": "2. Listar Serviços (Público)",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/tenants/{{tenantSlug}}/services"
+					}
+				},
+				{
+					"name": "3. Horários Disponíveis",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tenants/{{tenantSlug}}/services/{{serviceId}}/availability?date=2024-03-15",
+							"query": [
+								{"key": "date", "value": "2024-03-15"}
+							]
+						}
+					}
+				},
+				{
+					"name": "4. Criar Agendamento (Público)",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/tenants/{{tenantSlug}}/bookings",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"date\": \"2024-03-15\",\n  \"time_slot\": \"14:00\",\n  \"duration\": 30,\n  \"customer_name\": \"Maria Santos\",\n  \"customer_phone\": \"+5511988888888\",\n  \"customer_email\": \"maria@email.com\",\n  \"notes\": \"Primeira vez\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.booking && jsonData.booking.id) {",
+									"        pm.collectionVariables.set('bookingId', jsonData.booking.id);",
+									"        pm.collectionVariables.set('cancelToken', jsonData.booking.cancel_token);",
+									"        console.log('Booking ID:', jsonData.booking.id);",
+									"        console.log('Cancel Token:', jsonData.booking.cancel_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "5. Cancelar Agendamento",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/tenants/{{tenantSlug}}/cancel/{{bookingId}}?token={{cancelToken}}",
+							"query": [
+								{"key": "token", "value": "{{cancelToken}}"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "CHAT - IA Chat",
+			"item": [
+				{
+					"name": "1. Iniciar Conversa",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/chat/{{tenantSlug}}/conversations",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer_id\": \"cliente-001\",\n  \"message\": \"Olá, bom dia!\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('conversationId', jsonData.id);",
+									"        console.log('Conversation ID:', jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "2. Enviar Mensagem",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/chat/{{tenantSlug}}/messages",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"conversation_id\": \"{{conversationId}}\",\n  \"message\": \"Quais serviços vocês oferecem?\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					}
+				},
+				{
+					"name": "3. Ver Histórico",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/chat/{{tenantSlug}}/conversations/{{conversationId}}"
+					}
+				},
+				{
+					"name": "4. Listar Conversas",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/chat/{{tenantSlug}}/conversations"
+					}
+				}
+			]
+		},
+		{
+			"name": "DASHBOARD - Métricas",
+			"item": [
+				{
+					"name": "1. Métricas",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/dashboard/metrics"
+					}
+				},
+				{
+					"name": "2. Calendário",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/dashboard/calendar"
+					}
+				},
+				{
+					"name": "3. Relatórios",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/dashboard/reports"
+					}
+				}
+			]
+		},
+		{
+			"name": "USERS - Usuários",
+			"item": [
+				{
+					"name": "1. Criar Usuário",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/createUser",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"funcionario@barbearia.com\",\n  \"password\": \"Senha@123\",\n  \"name\": \"Pedro Funcionário\",\n  \"age\": 25\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					}
+				},
+				{
+					"name": "2. Buscar por ID",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/getUserById/{{userId}}"
+					}
+				},
+				{
+					"name": "3. Buscar por Email",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/getUserByEmail/joao@barbearia.com"
+					}
+				},
+				{
+					"name": "4. Atualizar Usuário",
+					"request": {
+						"method": "PUT",
+						"url": "{{baseUrl}}/updateUser/{{userId}}",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"joao@barbearia.com\",\n  \"password\": \"NovaSenha@123\",\n  \"name\": \"João Silva Atualizado\",\n  \"age\": 30\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					}
+				},
+				{
+					"name": "5. Deletar Usuário",
+					"request": {
+						"method": "DELETE",
+						"url": "{{baseUrl}}/deleteUser/{{userId}}"
+					}
+				}
+			]
+		}
+	]
+}

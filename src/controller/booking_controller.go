@@ -22,6 +22,8 @@ type BookingControllerInterface interface {
 	GetAvailabilityByTenantSlug(c *gin.Context)
 	CreateBookingForTenantSlug(c *gin.Context)
 	UpdateBookingStatus(c *gin.Context)
+	GetTenantPublicInfo(c *gin.Context)
+	CancelBookingPublic(c *gin.Context)
 }
 
 type bookingController struct {
@@ -187,4 +189,34 @@ func (bc *bookingController) UpdateBookingStatus(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.BookingResponse{Booking: updatedBooking})
+}
+
+func (bc *bookingController) GetTenantPublicInfo(c *gin.Context) {
+	tenantSlug := c.Param("slug")
+
+	tenant, err := bc.booking.GetTenantPublicInfo(tenantSlug)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.ConvertTenantToPublicInfo(tenant))
+}
+
+func (bc *bookingController) CancelBookingPublic(c *gin.Context) {
+	bookingID := c.Param("bookingId")
+	token := c.Query("token")
+
+	if token == "" {
+		c.JSON(http.StatusBadRequest, rest_err.NewBadRequestError("token is required"))
+		return
+	}
+
+	updated, err := bc.booking.CancelBookingWithToken(bookingID, token)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.BookingResponse{Booking: updated})
 }
