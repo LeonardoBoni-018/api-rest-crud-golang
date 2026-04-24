@@ -15,6 +15,7 @@ func InitRoutes(
 	bookingController controller.BookingControllerInterface,
 	dashboardController controller.DashboardControllerInterface,
 	chatController controller.ChatControllerInterface,
+	paymentController controller.PaymentControllerInterface,
 ) {
 
 	r.GET("/getUserById/:userId", user.VerifyTokenMiddleware, userController.FindUserById)
@@ -54,4 +55,10 @@ func InitRoutes(
 	r.POST("/chat/:slug/messages", chatController.SendMessage)
 	r.POST("/chat/:slug/conversations/:conversationId/messages", chatController.SendMessage)
 	r.GET("/chat/:slug/conversations/:conversationId", chatController.GetConversation)
+
+	r.GET("/plans", paymentController.GetPlans)
+	r.POST("/payments/checkout", user.VerifyTokenMiddleware, paymentController.CreateCheckout)
+	r.GET("/payments/subscription", user.VerifyTokenMiddleware, paymentController.GetSubscription)
+	r.POST("/payments/cancel", user.VerifyTokenMiddleware, paymentController.CancelSubscription)
+	r.POST("/webhooks/stripe", paymentController.HandleWebhook)
 }
