@@ -6,12 +6,31 @@ services:
     ports:
       - '8080:8080'
     environment:
-      - MONGODB_URI=${MONGODB_URI}
-      - JWT_SECRET=${JWT_SECRET}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MONGODB_URL=mongodb://mongo:27017
+      - MONGODB_USER_DB=users
+      - MONGODB_USER_COLLECTION=users
+      - MONGODB_TENANT_COLLECTION=tenants
+      - MONGODB_SERVICE_COLLECTION=services
+      - MONGODB_BOOKING_COLLECTION=bookings
+      - MONGODB_CHAT_COLLECTION=conversations
+      - MONGODB_SUBSCRIPTION_COLLECTION=subscriptions
+      - MONGODB_PAYMENT_COLLECTION=payments
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-sua_chave_secreta_aqui}
+      - JWT_SECRET=${JWT_SECRET:-seu_jwt_secret_aqui}
+      - AI_PROVIDER=${AI_PROVIDER:-fallback}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-brevo}
+      - BREVO_API_KEY=${BREVO_API_KEY:-}
+      - BREVO_FROM_EMAIL=${BREVO_FROM_EMAIL:-}
+      - BREVO_FROM_NAME=${BREVO_FROM_NAME:-}
+      - STRIPE_API_KEY=${STRIPE_API_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - STRIPE_PRICE_BASIC_ID=${STRIPE_PRICE_BASIC_ID:-}
+      - STRIPE_PRICE_PRO_ID=${STRIPE_PRICE_PRO_ID:-}
+      - STRIPE_PRICE_ENTERPRISE_ID=${STRIPE_PRICE_ENTERPRISE_ID:-}
     depends_on:
       - mongo
-      - redis
 
   mongo:
     image: mongo:7.0
