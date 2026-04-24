@@ -32,11 +32,11 @@ func (s *bookingService) CreateBookingForTenantSlug(slug string, booking *bookin
 		return nil, err
 	}
 
-	service, err := s.serviceRepository.FindServiceByID(booking.ServiceID)
+	serviceItem, err := s.serviceRepository.FindServiceByID(booking.ServiceID)
 	if err != nil {
 		return nil, err
 	}
-	if service.TenantID != tenant.ID {
+	if serviceItem.TenantID != tenant.ID {
 		return nil, rest_err.NewBadRequestError("service does not belong to tenant")
 	}
 
@@ -45,7 +45,16 @@ func (s *bookingService) CreateBookingForTenantSlug(slug string, booking *bookin
 		booking.Status = "pending"
 	}
 
-	return s.bookingRepository.CreateBooking(booking)
+	created, err := s.bookingRepository.CreateBooking(booking)
+	if err != nil {
+		return nil, err
+	}
+
+	if created.CustomerEmail != "" {
+		go s.notificationService.SendBookingConfirmation(created, tenant, serviceItem)
+	}
+
+	return created, nil
 }
 
 func (s *bookingService) UpdateBookingStatus(tenantID, bookingID, status string) (*bookingdomain.Booking, *rest_err.RestErr) {

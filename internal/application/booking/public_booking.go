@@ -43,12 +43,26 @@ func (s *bookingService) CancelBookingWithToken(bookingID, cancelToken string) (
 		return nil, rest_err.NewBadRequestError("cannot cancel a completed booking")
 	}
 
+	tenant, terr := s.tenantRepository.FindTenantById(booking.TenantID)
+	if terr != nil {
+		return nil, terr
+	}
+
+	serviceItem, serr := s.serviceRepository.FindServiceByID(booking.ServiceID)
+	if serr != nil {
+		return nil, serr
+	}
+
 	booking.Status = "cancelled"
 	booking.UpdatedAt = time.Now()
 
 	updated, err := s.bookingRepository.UpdateBooking(booking)
 	if err != nil {
 		return nil, err
+	}
+
+	if updated.CustomerEmail != "" {
+		go s.notificationService.SendBookingCancellation(updated, tenant, serviceItem)
 	}
 
 	return updated, nil

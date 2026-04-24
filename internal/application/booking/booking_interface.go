@@ -10,6 +10,7 @@ import (
 	bookingRepo "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/booking/repository"
 	serviceRepo "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/service/repository"
 	tenantRepo "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/infrastructure/database/tenant/repository"
+	notificationapp "github.com/LeonardoBoni-018/api-rest-crud-golang/internal/application/notification"
 )
 
 type BookingService interface {
@@ -26,9 +27,10 @@ type BookingService interface {
 }
 
 type bookingService struct {
-	bookingRepository bookingRepo.BookingRepository
-	tenantRepository  tenantRepo.TenantRepository
+	bookingRepository    bookingRepo.BookingRepository
+	tenantRepository tenantRepo.TenantRepository
 	serviceRepository serviceRepo.ServiceRepository
+	notificationService notificationapp.NotificationService
 }
 
 func NewBookingService(
@@ -37,8 +39,9 @@ func NewBookingService(
 	serviceRepo serviceRepo.ServiceRepository,
 ) BookingService {
 	return &bookingService{
-		bookingRepository: bookingRepo,
+		bookingRepository:    bookingRepo,
 		tenantRepository:  tenantRepo,
 		serviceRepository: serviceRepo,
+		notificationService: notificationapp.NewNotificationService(nil),
 	}
 }

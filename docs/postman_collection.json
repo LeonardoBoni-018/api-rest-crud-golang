@@ -238,7 +238,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"date\": \"2024-03-15\",\n  \"time_slot\": \"14:00\",\n  \"duration\": 30,\n  \"customer_name\": \"Maria Santos\",\n  \"customer_phone\": \"+5511988888888\",\n  \"customer_email\": \"maria@email.com\",\n  \"notes\": \"Cliente preferida\"\n}",
+							"raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"date\": \"2026-04-25\",\n  \"time_slot\": \"14:00\",\n  \"duration\": 30,\n  \"customer_name\": \"Maria Santos\",\n  \"customer_phone\": \"+5511988888888\",\n  \"customer_email\": \"maria@email.com\",\n  \"notes\": \"Cliente preferida\"\n}",
 							"options": {"raw": {"language": "json"}}
 						}
 					},
@@ -281,10 +281,10 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{baseUrl}}/bookings/availability?service_id={{serviceId}}&date=2024-03-15",
+							"raw": "{{baseUrl}}/bookings/availability?service_id={{serviceId}}&date=2026-04-25",
 							"query": [
 								{"key": "service_id", "value": "{{serviceId}}"},
-								{"key": "date", "value": "2024-03-15"}
+								{"key": "date", "value": "2026-04-25"}
 							]
 						}
 					}
@@ -328,9 +328,9 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{baseUrl}}/tenants/{{tenantSlug}}/services/{{serviceId}}/availability?date=2024-03-15",
+							"raw": "{{baseUrl}}/tenants/{{tenantSlug}}/services/{{serviceId}}/availability?date=2026-04-25",
 							"query": [
-								{"key": "date", "value": "2024-03-15"}
+								{"key": "date", "value": "2026-04-25"}
 							]
 						}
 					}
@@ -345,7 +345,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"date\": \"2024-03-15\",\n  \"time_slot\": \"14:00\",\n  \"duration\": 30,\n  \"customer_name\": \"Maria Santos\",\n  \"customer_phone\": \"+5511988888888\",\n  \"customer_email\": \"maria@email.com\",\n  \"notes\": \"Primeira vez\"\n}",
+							"raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"date\": "2026-04-25",\n  \"time_slot\": \"14:00\",\n  \"duration\": 30,\n  \"customer_name\": \"Cliente Teste\",\n  \"customer_phone\": \"+5511988888888\",\n  \"customer_email\": \"teste@email.com\",\n  \"notes\": \"Teste de notificacao\"\n}",
 							"options": {"raw": {"language": "json"}}
 						}
 					},
@@ -528,6 +528,70 @@
 						"method": "DELETE",
 						"url": "{{baseUrl}}/deleteUser/{{userId}}"
 					}
+				}
+			]
+		},
+		{
+			"name": "NOTIFICATIONS - Emails",
+			"item": [
+				{
+					"name": "1. Criar Agendamento com Email",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/tenants/{{tenantSlug}}/bookings",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"date\": \"2026-04-25\",\n  \"time_slot\": \"14:00\",\n  \"duration\": 30,\n  \"customer_name\": \"João Cliente\",\n  \"customer_phone\": \"+5511988888888\",\n  \"customer_email\": \"joao.cliente@email.com\",\n  \"notes\": \"Teste de notificação\"\n}",
+							"options": {"raw": {"language": "json"}}
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.booking && jsonData.booking.id) {",
+									"        pm.collectionVariables.set('bookingId', jsonData.booking.id);",
+									"        pm.collectionVariables.set('cancelToken', jsonData.booking.cancel_token);",
+									"        console.log('Booking ID:', jsonData.booking.id);",
+									"        console.log('Email de confirmacao enviado automaticamente!');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "2. Cancelar Agendamento",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/tenants/{{tenantSlug}}/cancel/{{bookingId}}?token={{cancelToken}}",
+							"query": [
+								{"key": "token", "value": "{{cancelToken}}"}
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    console.log('Email de cancelamento enviado automaticamente!');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
 				}
 			]
 		}
